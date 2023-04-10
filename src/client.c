@@ -14,7 +14,10 @@
 #include <errno.h>
 #include <time.h>
 
-#define BUFSIZE 32
+#define BUFSIZE 320
+
+void readfromcl(char* buf, int cfd);
+void writetocl(char* buf, int cfd);
 
 int main(int argc, char *argv[])
 {
@@ -46,49 +49,20 @@ int main(int argc, char *argv[])
 
     {
         char buf[BUFSIZE];
-        int c;
-        srand(time(NULL));
-        for (c = 0; c < BUFSIZE-1; c++)
-        {
-            buf[c] = 'A' + (random() % 26);
-        }
+        readfromcl(buf, cfd);
+        printf("Received %s\n", buf);
+
+        
+        printf("Enter your answer: ");
+        fgets(buf, BUFSIZE, stdin);
         buf[BUFSIZE-1] = '\0';
 
-        printf(
-                "Sending %s to localhost:%s\n",
-                buf, argv[2]);
+        printf("Sending %s to localhost:%s\n", buf, argv[2]);
 
-        size_t totWritten;
-        const char* bufw = buf;
-        for (totWritten = 0; totWritten < BUFSIZE; ) {
-            ssize_t numWritten = write(cfd, bufw, BUFSIZE - totWritten);
-            if (numWritten <= 0) {
-                if (numWritten == -1 && errno == EINTR)
-                    continue;
-                else {
-                    fprintf(stderr, "Write error. Errno %d.\n", errno);
-                }
-            }
-            totWritten += numWritten;
-            bufw += numWritten;
-        }
 
-        size_t totRead;
-        char* bufr = buf;
-        for (totRead = 0; totRead < BUFSIZE; ) {
-            ssize_t numRead = read(cfd, bufr, BUFSIZE - totRead);
-            if (numRead == 0)
-                break;
-            if (numRead == -1) {
-                if (errno == EINTR)
-                    continue;
-                else {
-                    fprintf(stderr, "Read error, Errno %d.\n", errno);
-                }
-            }
-            totRead += numRead;
-            bufr += numRead;
-        }
+        writetocl(buf, cfd);
+
+        readfromcl(buf, cfd);
         printf("Received %s\n", buf);
     }
 
@@ -99,4 +73,41 @@ int main(int argc, char *argv[])
     }
 
     exit(EXIT_SUCCESS);
+}
+
+void readfromcl(char* buf, int cfd) {
+    size_t totRead;
+    char* bufr = buf;
+    for (totRead = 0; totRead < BUFSIZE; ) {
+        ssize_t numRead = read(cfd, bufr, BUFSIZE - totRead);
+        if (numRead == 0)
+            break;
+        if (numRead == -1) {
+            if (errno == EINTR)
+                continue;
+            else {
+                fprintf(stderr, "Read error.\n");
+            }
+        }
+        totRead += numRead;
+        bufr += numRead;
+    }
+}
+
+void writetocl(char* buf, int cfd) {
+    size_t totWritten;
+    const char* bufw = buf;
+    for (totWritten = 0; totWritten < BUFSIZE; ) {
+        ssize_t numWritten = write(cfd, bufw, BUFSIZE - totWritten);
+        if (numWritten <= 0) {
+            if (numWritten == -1 && errno == EINTR)
+                continue;
+            else {
+                fprintf(stderr, "Write error.\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+        totWritten += numWritten;
+        bufw += numWritten;
+    }
 }
