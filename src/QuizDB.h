@@ -1,5 +1,5 @@
 //
-// Created by ismail on 08/04/2023.
+// Created by ismai on 10/04/2023.
 //
 
 #ifndef QUIZ_GAME_ON_SERVER_QUIZDB_H
@@ -105,4 +105,4 @@ char* QuizA[] = {
         "Y"
 };
 
-#endif //QUIZ_GAME_ON_SERVER_QUIZDB_H
+#endif /* _QUIZDB_H */
