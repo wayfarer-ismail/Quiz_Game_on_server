@@ -1,9 +1,9 @@
 CC = gcc
 CFLAGS = -Wall
 
-SERVER_SRC = src/server.c src/QuizDB.h
-CLIENT_SRC = src/client.c
-PRINTQUIZ_SRC = src/printquiz.c src/QuizDB.h
+SERVER_SRC = src/server.c src/QuizDB.h src/io.c src/io.h
+CLIENT_SRC = src/client.c src/io.c src/io.h
+PRINTQUIZ_SRC = src/printquiz.c src/QuizDB.h 
 
 all: server client printquiz
 

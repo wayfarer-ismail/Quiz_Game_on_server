@@ -10,13 +10,10 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include "io.h"
 
 #define SERVERIP "127.0.0.1"
 #define BACKLOG 10
-#define BUFSIZE 320
-
-void readfromcl(char* buf, int cfd);
-void writetocl(char* buf, int cfd);
 
 int main(int argc, char *argv[])
 {
@@ -84,18 +81,17 @@ int main(int argc, char *argv[])
         }
 
         char welcome[] = "Welcome to Unix Programming Quiz! \nThe quiz comprises five questions posed to you one after the other." 
-                        "You have only one attempt to answer a question." 
-                        "Your final score will be sent to you after conclusion of the quiz." 
-                        "To start the quiz, press Y and <enter>." 
-                        "To quit the quiz, press q and <enter>.\r";
+                        "\nYou have only one attempt to answer a question." 
+                        "\nYour final score will be sent to you after conclusion of the quiz." 
+                        "\nTo start the quiz, press Y and <enter>." 
+                        "\nTo quit the quiz, press q and <enter>.\r";
 
-        // for(int i=0; i<strlen(welcome)/BUFSIZE; i++) {
-        //     writetocl(welcome + i*BUFSIZE, cfd);
-        // }
+
         writetocl(welcome, cfd);
 
         char buf[BUFSIZE];
         readfromcl(buf, cfd);
+        printf("Received %s\n", buf);
 
         writetocl(buf, cfd);
 
@@ -113,42 +109,4 @@ int main(int argc, char *argv[])
     }
 
     exit(EXIT_SUCCESS);
-}
-
-void readfromcl(char* buf, int cfd) {
-    size_t totRead;
-    char* bufr = buf;
-    for (totRead = 0; totRead < BUFSIZE; ) {
-        ssize_t numRead = read(cfd, bufr, BUFSIZE - totRead);
-        if (numRead == 0)
-            break;
-        if (numRead == -1) {
-            if (errno == EINTR)
-                continue;
-            else {
-                fprintf(stderr, "Read error.\n");
-            }
-        }
-        totRead += numRead;
-        bufr += numRead;
-    }
-    printf("Received %s\n", buf);
-}
-
-void writetocl(char* buf, int cfd) {
-    size_t totWritten;
-    const char* bufw = buf;
-    for (totWritten = 0; totWritten < BUFSIZE; ) {
-        ssize_t numWritten = write(cfd, bufw, BUFSIZE - totWritten);
-        if (numWritten <= 0) {
-            if (numWritten == -1 && errno == EINTR)
-                continue;
-            else {
-                fprintf(stderr, "Write error.\n");
-                exit(EXIT_FAILURE);
-            }
-        }
-        totWritten += numWritten;
-        bufw += numWritten;
-    }
 }
