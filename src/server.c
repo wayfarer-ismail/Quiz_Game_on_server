@@ -10,10 +10,13 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include "QuizDB.h"
 #include "io.h"
 
 #define SERVERIP "127.0.0.1"
 #define BACKLOG 10
+
+void startgame(int cfd);
 
 int main(int argc, char *argv[])
 {
@@ -80,20 +83,13 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Connection from (?UNKNOWN?)");
         }
 
-        char welcome[] = "Welcome to Unix Programming Quiz! \nThe quiz comprises five questions posed to you one after the other." 
-                        "\nYou have only one attempt to answer a question." 
-                        "\nYour final score will be sent to you after conclusion of the quiz." 
-                        "\nTo start the quiz, press Y and <enter>." 
-                        "\nTo quit the quiz, press q and <enter>.\r";
-
-
-        writetocl(welcome, cfd);
-
-        char buf[BUFSIZE];
-        readfromcl(buf, cfd);
-        printf("Received %s\n", buf);
-
-        writetocl(buf, cfd);
+        int pid = fork();
+        if (pid == -1) {
+            fprintf(stderr, "fork() error.\n");
+            exit(-1);
+        } else if (pid == 0) { //child process
+            startgame(cfd);    //service client and move on to next client
+        }
 
         if (close(cfd) == -1) /* Close connection */
         {
@@ -109,4 +105,39 @@ int main(int argc, char *argv[])
     }
 
     exit(EXIT_SUCCESS);
+}
+
+void startgame(int cfd) {
+    char welcome[] = "Welcome to Unix Programming Quiz! \nThe quiz comprises five questions posed to you one after the other." 
+                "\nYou have only one attempt to answer a question." 
+                "\nYour final score will be sent to you after conclusion of the quiz." 
+                "\nTo start the quiz, press Y and <enter>." 
+                "\nTo quit the quiz, press q and <enter>.\r";
+
+    writetocl(welcome, cfd);
+
+    char buf[BUFSIZE];
+    readfromcl(buf, cfd);
+    printf("Received %s\n", buf);
+
+    switch (buf[0]) {
+        case 'Y':
+            break;
+        case 'q':
+            exit(0);
+        default:
+            printf("Invalid input.");
+            return;
+    }
+
+    int qids[] = {0, 0, 0, 0, 0};
+    for (int i=0; i<5; i++) {
+        //generate a random number between 1 and 43
+        qids[i] = rand() % 43 + 1;
+        
+        writetocl(QuizQ[qids[i]], cfd);
+        readfromcl(buf, cfd);
+        printf("Received %s\n", buf);
+    }
+    writetocl(buf, cfd);
 }

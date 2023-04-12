@@ -15,6 +15,8 @@
 #include <time.h>
 #include "io.h"
 
+void startgame(int cfd);
+
 int main(int argc, char *argv[])
 {
     if (argc != 3)
@@ -47,19 +49,15 @@ int main(int argc, char *argv[])
         char buf[BUFSIZE];
         readfromcl(buf, cfd);
         printf("Received %s\n", buf);
-
         
         printf("Enter your answer: ");
         fgets(buf, BUFSIZE, stdin);
         buf[BUFSIZE-1] = '\0';
 
-        printf("Sending %s to localhost:%s\n", buf, argv[2]);
-
-
-        writetocl(buf, cfd);
-
-        readfromcl(buf, cfd);
-        printf("Received %s\n", buf);
+        if (buf[0] == 'Y') {
+            writetocl(buf, cfd);
+            startgame(cfd);
+        }
     }
 
     if (close(cfd) == -1) /* Close connection */
@@ -69,4 +67,19 @@ int main(int argc, char *argv[])
     }
 
     exit(EXIT_SUCCESS);
+}
+
+void startgame(int cfd) {
+
+    char buf[BUFSIZE];
+    for (int i = 0; i < 5; i++) {
+        readfromcl(buf, cfd);
+        printf("Received %s\n", buf);
+
+        printf("Enter your answer: ");
+        fgets(buf, BUFSIZE, stdin);
+        buf[BUFSIZE-1] = '\0';
+
+        writetocl(buf, cfd);
+    }
 }

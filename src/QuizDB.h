@@ -9,6 +9,8 @@
  *         Quiz Questions            *
  *************************************/
 
+#define NUM_QUESTIONS 43
+
 char* QuizQ[] = {
         "In a 32-bit system architecture, each process can address 4 Giga bytes of memory. Y or N?",
         "Is Stack a section of a process's address space? (Y or N)",
