@@ -117,7 +117,7 @@ void startgame(int cfd) {
     writetocl(welcome, cfd);
 
     char buf[BUFSIZE];
-    readfromcl(buf, cfd);
+    readfromcl(buf, cfd); //read user choice to start or quit
     printf("Received %s\n", buf);
 
     switch (buf[0]) {
@@ -130,14 +130,29 @@ void startgame(int cfd) {
             return;
     }
 
-    int qids[] = {0, 0, 0, 0, 0};
+    int score = 0;
     for (int i=0; i<5; i++) {
         //generate a random number between 1 and 43
-        qids[i] = rand() % 43 + 1;
-        
-        writetocl(QuizQ[qids[i]], cfd);
+        int qid = rand() % NUM_QUESTIONS;
+
+        writetocl(QuizQ[qid], cfd);
         readfromcl(buf, cfd);
+        if (buf[strlen(buf)-1] == '\n') { //remove trailing newline
+            buf[strlen(buf)-1] = '\0';
+        }
         printf("Received %s\n", buf);
+
+        if (strcmp(buf, QuizA[qid]) == 0) {
+            score++;
+            writetocl("Right Answer.", cfd);
+        } else {
+            char wrongAnsMsg[100];
+            sprintf(wrongAnsMsg, "Wrong Answer. Right answer is %s", QuizA[qid]);
+            writetocl(wrongAnsMsg, cfd);
+        }
     }
-    writetocl(buf, cfd);
+
+    char finalScoreMsg[50];
+    sprintf(finalScoreMsg, "Your quiz score is %d/5. Goodbye!", score);
+    writetocl(finalScoreMsg, cfd);
 }
