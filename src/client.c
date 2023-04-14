@@ -73,13 +73,18 @@ void startgame(int cfd) {
 
     char buf[BUFSIZE];
     for (int i = 0; i < 5; i++) {
-        readfromcl(buf, cfd);
-        printf("Received %s\n", buf);
+        readfromcl(buf, cfd); //read question
+        printf("Question: %s\n", buf);
 
         printf("Enter your answer: ");
         fgets(buf, BUFSIZE, stdin);
         buf[BUFSIZE-1] = '\0';
 
-        writetocl(buf, cfd);
+        writetocl(buf, cfd); //send answer
+        readfromcl(buf, cfd); //read result
+        printf("Result: %s\n", buf);
     }
+
+    readfromcl(buf, cfd); //read final result
+    printf("Final result: %s\n", buf);
 }
