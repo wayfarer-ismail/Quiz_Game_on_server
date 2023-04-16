@@ -129,7 +129,7 @@ void startgame(int cfd) {
         case 'Y':
             break;   //continue to quiz
         case 'q':
-            exit(0); //kill child process, main server still lives
+            _exit(0); //kill child process, main server still lives
         default:
             printf("Invalid input."); //undefined behavior
             return;

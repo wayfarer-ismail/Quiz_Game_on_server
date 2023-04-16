@@ -54,8 +54,8 @@ int main(int argc, char *argv[])
         fgets(buf, BUFSIZE, stdin);
         buf[BUFSIZE-1] = '\0';
 
-        if (buf[0] == 'Y') {
-            writetofile(buf, cfd);
+        writetofile(buf, cfd);
+        if (buf[0] == 'Y') {    
             startgame(cfd);
         }
     }
