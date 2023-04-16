@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
     {
         char buf[BUFSIZE];
-        readfromcl(buf, cfd);
+        readfromfile(buf, cfd);
         printf("Received %s\n", buf);
         
         printf("Enter your answer: ");
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         buf[BUFSIZE-1] = '\0';
 
         if (buf[0] == 'Y') {
-            writetocl(buf, cfd);
+            writetofile(buf, cfd);
             startgame(cfd);
         }
     }
@@ -73,18 +73,18 @@ void startgame(int cfd) {
 
     char buf[BUFSIZE];
     for (int i = 0; i < 5; i++) {
-        readfromcl(buf, cfd); //read question
+        readfromfile(buf, cfd); //read question
         printf("Question: %s\n", buf);
 
         printf("Enter your answer: ");
         fgets(buf, BUFSIZE, stdin);
         buf[BUFSIZE-1] = '\0';
 
-        writetocl(buf, cfd); //send answer
-        readfromcl(buf, cfd); //read result
+        writetofile(buf, cfd); //send answer
+        readfromfile(buf, cfd); //read reply 
         printf("Result: %s\n", buf);
     }
 
-    readfromcl(buf, cfd); //read final result
+    readfromfile(buf, cfd); //read final result
     printf("Final result: %s\n", buf);
 }

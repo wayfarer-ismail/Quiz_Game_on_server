@@ -8,7 +8,7 @@
 #include <errno.h>
 #include "io.h"
 
-void readfromcl(char* buf, int cfd) {
+void readfromfile(char* buf, int cfd) {
     size_t totRead;
     char* bufr = buf;
     for (totRead = 0; totRead < BUFSIZE; ) {
@@ -27,7 +27,7 @@ void readfromcl(char* buf, int cfd) {
     }
 }
 
-void writetocl(char* buf, int cfd) {
+void writetofile(char* buf, int cfd) {
     size_t totWritten;
     const char* bufw = buf;
     for (totWritten = 0; totWritten < BUFSIZE; ) {
