@@ -29,8 +29,19 @@ int main(int argc, char *argv[])
 
     memset(&serverAddress, 0, sizeof(struct sockaddr_in));
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_addr.s_addr = inet_addr(argv[1]);
-    serverAddress.sin_port = htons(atoi(argv[2]));
+    
+    //validate and assign server ip
+    if (inet_pton(AF_INET, argv[1], &serverAddress.sin_addr) <= 0) {
+        fprintf(stderr, "Invalid IP address\n");
+        exit(1);
+    }
+    
+    int port = atoi(argv[2]);
+    if (port == 0 || port > 65535) { //check if port is valid
+        printf("Invalid port number\n");
+        exit(1);
+    }
+    serverAddress.sin_port = htons(port);
 
     int cfd = socket(AF_INET, SOCK_STREAM, 0);
     if (cfd == -1) {
@@ -74,7 +85,7 @@ void startgame(int cfd) {
     char buf[BUFSIZE];
     for (int i = 0; i < 5; i++) {
         readfromfile(buf, cfd); //read question
-        printf("Question: %s\n", buf);
+        printf("\nQuestion: %s\n", buf);
 
         printf("Enter your answer: ");
         fgets(buf, BUFSIZE, stdin);
@@ -86,5 +97,5 @@ void startgame(int cfd) {
     }
 
     readfromfile(buf, cfd); //read final result
-    printf("Final result: %s\n", buf);
+    printf("\nFinal result: %s\n", buf);
 }

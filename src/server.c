@@ -37,7 +37,13 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Invalid IP address\n");
         exit(1);
     }
-    serverAddress.sin_port = htons(atoi(argv[2]));
+
+    int port = atoi(argv[2]);
+    if (port == 0 || port > 65535) { //check if port is valid
+        printf("Invalid port number\n");
+        exit(1);
+    }
+    serverAddress.sin_port = htons(port);
 
     int lfd = socket(AF_INET, SOCK_STREAM, 0);
     if (lfd == -1) {
